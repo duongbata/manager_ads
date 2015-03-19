@@ -13,10 +13,10 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<!-- <value>classpath:ads_mobile.properties</value>
-				<value>classpath:redis.properties</value> -->
-				<value>classpath:ads_mobile_server.properties</value>
-				<value>classpath:redis_server.properties</value>
+				<value>classpath:ads_mobile.properties</value>
+				<value>classpath:redis.properties</value>
+				<!-- <value>classpath:ads_mobile_server.properties</value>
+				<value>classpath:redis_server.properties</value> -->
 			</list>
 		</property>
 	</bean>

@@ -13,6 +13,7 @@
 		<put-attribute name="styles" value="/WEB-INF/pages/styles.jsp"/>
 		<put-attribute name="header" value=""/>
 	</definition>
+	<definition name="PAGING" template="/WEB-INF/pages/paging.jsp"/>
 	<definition name="DETAIL" extends="BASE">
 		<put-attribute name="title" value="Chi tiết"/>
 		<put-attribute name="body" value="/WEB-INF/pages/detail.jsp"/>
@@ -94,6 +95,14 @@
 		<put-attribute name="title" value="Admod Config"/>
 		<put-attribute name="body" value="/WEB-INF/pages/APP04.jsp"/>
 	</definition>
+	<definition name="APP05" extends="BASE">
+		<put-attribute name="title" value="List Group"/>
+		<put-attribute name="body" value="/WEB-INF/pages/APP05.jsp"/>
+	</definition>
+	<definition name="APP05_2" extends="BASE">
+		<put-attribute name="title" value="Edit Group"/>
+		<put-attribute name="body" value="/WEB-INF/pages/APP05_2.jsp"/>
+	</definition>
 	<!-- APP stop -->
-	
+		
 </tiles-definitions>

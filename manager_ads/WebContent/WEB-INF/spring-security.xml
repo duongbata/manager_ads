@@ -10,7 +10,9 @@
 		<intercept-url pattern="/APP01*" access="hasAnyRole('admin')"/>
 		<intercept-url pattern="/APP02*" access="hasAnyRole('admin')"/>
 		<intercept-url pattern="/APP04*" access="hasAnyRole('admin')"/>
+		<intercept-url pattern="/APP05*" access="hasAnyRole('admin')"/>
 		<intercept-url pattern="/APP03*" access="hasAnyRole('dev')"/>
+		
 		<intercept-url pattern="/ADV03*" access="hasAnyRole('admin','user')"/>
 		<!-- <intercept-url pattern="/j_spring_security_check" access="IS_AUTHENTICATED_ANONYMOUSLY"/> --> 
 		<!-- <intercept-url pattern="/dangnhap" access="IS_AUTHENTICATED_ANONYMOUSLY"/> --> 

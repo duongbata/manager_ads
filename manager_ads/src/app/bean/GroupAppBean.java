@@ -21,6 +21,9 @@ public class GroupAppBean {
 	
 	private List<OSConfigBean> listOsConfig;
 	
+	//APP05
+	private List<AppBean> listAppBean;  
+	
 	public String getGroupId() {
 		return groupId;
 	}
@@ -91,5 +94,13 @@ public class GroupAppBean {
 	
 	public void setListOsConfig(List<OSConfigBean> listOsConfig) {
 		this.listOsConfig = listOsConfig;
+	}
+
+	public List<AppBean> getListAppBean() {
+		return listAppBean;
+	}
+
+	public void setListAppBean(List<AppBean> listAppBean) {
+		this.listAppBean = listAppBean;
 	}
 }

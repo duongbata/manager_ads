@@ -83,6 +83,7 @@ public class DetailAction extends ActionSupport{
 			, interceptorRefs={
 				@InterceptorRef(value="scope",params={"key","infoValue","session","info","autoCreateSession","true"})
 				, @InterceptorRef("basicStack")
+				
 			}
 			,results={
 				@Result(name="success",location="DETAIL",type="tiles")

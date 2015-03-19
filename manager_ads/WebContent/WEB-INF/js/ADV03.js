@@ -90,6 +90,7 @@ $(document).ready(function(){
     });
 });
 
+//Datepicker from jsp
 $(function () {
     $('.datetimepicker').datetimepicker();
 });

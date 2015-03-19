@@ -45,6 +45,9 @@
 				<s:a href="APP02_init" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
 					<span class="glyphicon glyphicon-th-list"></span> App
 				</s:a>
+				<s:a href="APP05_init" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
+					<span class="glyphicon glyphicon-th-list"></span> List Group
+				</s:a>
 			</s:if>
 			<s:if test="%{#user in info.user.listRoleName}">
 				<s:a href="ADV03_initCampaign" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
