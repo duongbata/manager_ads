@@ -15,5 +15,6 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<mapper resource="sqlMap/ADV03SqlMap.xml"/>
 		<mapper resource="sqlMap/APP01SqlMap.xml"/>
 		<mapper resource="sqlMap/APP02SqlMap.xml"/>
+		<mapper resource="sqlMap/APP05SqlMap.xml"/>
 	</mappers>
 </configuration>

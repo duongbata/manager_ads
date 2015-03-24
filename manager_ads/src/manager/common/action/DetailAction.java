@@ -23,6 +23,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -116,10 +117,13 @@ public class DetailAction extends ActionSupport{
 		return "success";
 	}
 	
-	@Action(value="/callAjax",results={@Result(name="success",type="json")})
+	@Action(value="/callAjax",results={@Result(name="success",type="json",params={"root","userBean"})})
 	public String callAjax() throws IOException {
 		String name = getName();
-		setName("Hello nguyen thanh trung");
+		userBean = new UserBean();
+		userBean.setId("1");
+		userBean.setName("trung");
+		setName(new ObjectMapper().writeValueAsString("Hello nguyen thanh trung"));
 		return "success";
 	}
 	

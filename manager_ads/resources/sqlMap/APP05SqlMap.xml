@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.dao.APP05Dao">
+	<resultMap type="bannerBean" id="bannerObject">
+		<result property="bannerId" column="banner_id"/>
+		<result property="campaignName" column="campaign_name"/>
+		<result property="campaignId" column="campaign_id"/>
+		<result property="bannerName" column="banner_name"/>
+		<result property="bannerDescription" column="banner_des"/>
+		<result property="typeName" column="type_name"/>
+		<result property="startTime" column="start_time"/>
+		<result property="stopTime" column="stop_time"/>
+		<result property="statusName" column="status_name"/>
+		<result property="statusId" column="status_id"/>
+		<result property="image1" column="image1"/>
+		<result property="image2" column="image2"/>
+		<result property="androidUrl" column="android_url"/>
+		<result property="iosUrl" column="ios_url"/>
+		<result property="windowsUrl" column="windows_url"/>
+		<result property="bannerType" column="banner_type"/>
+		<result property="bannerTypeName" column="banner_type_name"/>
+		<result property="osTarget" column="os_target"/>
+		<result property="maxView" column="max_view"/>
+		<result property="maxClick" column="max_click"/>
+		<result property="userId" column="uid"/>
+		<result property="maxClickPerDay" column="max_click_per_day"/>
+		<result property="maxViewPerDay" column="max_view_per_day"/>
+	</resultMap>
+	<select id="selectBannerSampleById" parameterType="string" resultMap="bannerObject">
+		SELECT bannerId as banner_id,name as banner_name from ads_banner
+		where campaignId = -1
+		and bannerId = #{bannerId}
+	</select>
+	<update id="updateBannerSample" parameterType="bannerBean">
+		update ads_banner
+		set des = #{bannerDescription}
+			, image1 = #{image1}
+			, image2 = #{image2}
+		where bannerId = #{bannerId} 
+	</update>
+	
+</mapper>

@@ -10,10 +10,10 @@
 	<div class="panel filterable">
 		<div class="">
 			<div class="pull-right">
-				<button type="button" class="btn btn-default btn-xs" id="btnAdd"
+				<%-- <button type="button" class="btn btn-default btn-xs" id="btnAdd"
 					style="width: 100px; ">
 					<span class="glyphicon glyphicon-plus"></span> Add
-				</button> &nbsp;&nbsp;
+				</button> &nbsp;&nbsp; --%>
 				<button type="button" class="btn btn-default btn-xs btn-filter"
 					style="width: 100px;">
 					<span class="glyphicon glyphicon-filter"></span> Filter
@@ -26,6 +26,8 @@
 				<tr class="filters">
 					<th style="background-color: #337ab7">#</th>
 					<th style="background-color: #337ab7"><input type="text" class="form-control" placeholder="Name"
+						disabled></th>
+					<th style="background-color: #337ab7"><input type="text" class="form-control" placeholder="App"
 						disabled></th>
 					<th style="background-color: #337ab7"><input type="text" class="form-control" placeholder="Description"
 						disabled></th>
@@ -46,6 +48,14 @@
 								<s:a value="%{#link}">
 									<s:property value="%{#group.groupName}"/>
 								</s:a>
+							</td>
+							<td style="vertical-align: middle;">
+								<s:iterator value="#group.listAppBean" status="listAppBeanStatus" var="appBean">
+									<s:set var="linkApp">/APP05_initDetailApp.action?uid=${uid}&&appId=${appId}</s:set>
+									<s:a value="%{#linkApp}">
+										<s:property value="%{#appBean.osId}"/><br/>	
+									</s:a>
+								</s:iterator>
 							</td>
 							<td style="vertical-align: middle;">
 								<s:property value="%{#group.groupDescription}"/>

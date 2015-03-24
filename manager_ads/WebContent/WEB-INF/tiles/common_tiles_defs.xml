@@ -103,6 +103,10 @@
 		<put-attribute name="title" value="Edit Group"/>
 		<put-attribute name="body" value="/WEB-INF/pages/APP05_2.jsp"/>
 	</definition>
+	<definition name="APP05_3" extends="BASE">
+		<put-attribute name="title" value="Detail App"/>
+		<put-attribute name="body" value="/WEB-INF/pages/APP05_3.jsp"/>
+	</definition>
 	<!-- APP stop -->
 		
 </tiles-definitions>

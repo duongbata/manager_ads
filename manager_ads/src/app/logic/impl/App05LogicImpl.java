@@ -1,25 +1,41 @@
 package app.logic.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import manager.ADV03.bean.BannerBean;
 import manager.common.bean.RedisConstant;
+import manager.common.bean.UserBean;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import app.action.APP01Action;
+import app.bean.AppBean;
 import app.bean.GroupAppBean;
 import app.bean.OSConfigBean;
+import app.bean.PropertyAppBean;
+import app.dao.APP01Dao;
+import app.dao.APP05Dao;
 import app.logic.App05LogicIF;
 
 @Service
 public class App05LogicImpl implements App05LogicIF{
+	private final static int NUMBER_OS = 3;
 	@Autowired
 	private StringRedisTemplate template;
+	
+	@Autowired
+	private APP01Dao app01Dao;
+	
+	@Autowired
+	private APP05Dao app05Dao;
 	
 	@Override
 	public List<GroupAppBean> listAllGroup() {
@@ -33,6 +49,44 @@ public class App05LogicImpl implements App05LogicIF{
 			groupApp.setGroupDescription((String)(template.opsForHash().get(key, "groupDescription")));
 			groupApp.setGroupTitle((String)(template.opsForHash().get(key, "groupTitle")));
 			groupApp.setGroupIcon((String)(template.opsForHash().get(key, "groupIcon")));
+			
+			//List App in Group
+			List<AppBean> listApp = new ArrayList<AppBean>();
+			String patternAppOfGroup = RedisConstant.DB_ADS_DEV + ":uid:*:group:"+groupApp.getGroupId()+":app:*";
+			Set<String> sAppKey = template.keys(patternAppOfGroup);
+			for (String appKey : sAppKey) {
+				String uid = appKey.split(":")[4];
+				AppBean app = new AppBean();
+				app.setGroupId(groupApp.getGroupId());
+				app.setOsId(String.valueOf(template.opsForHash().get(appKey, "osId")));
+				app.setAppId(String.valueOf(template.opsForHash().get(appKey, "appId")));
+				app.setUid(uid);
+				/*List<PropertyAppBean> listPropertyApp = new ArrayList<PropertyAppBean>();
+				Set<Object> setObjKeyOfApp = template.opsForHash().keys(appKey);
+				for (Object objKeyOfApp : setObjKeyOfApp) {
+					String strKey = (String)objKeyOfApp;
+					Object value = template.opsForHash().get(appKey, strKey);
+					String strValue = value.toString();
+					if ("appId".equals(strKey)) {
+						app.setAppId(strValue);
+					} else if ("osId".equals(strKey)) {
+						app.setOsId(strValue);
+					} else if ("version".equals(strKey)) {
+						app.setVersion(strValue);
+					} else if ("url".equals(strKey)) {
+						app.setUrl(strValue);
+					} else if ("config".equals(strKey)) {
+						app.setConfig(strValue);
+					} else {
+						PropertyAppBean propApp = new PropertyAppBean(strKey, strValue);
+						listPropertyApp.add(propApp);
+					}
+				}
+				app.setListProperty(listPropertyApp);
+				*/
+				listApp.add(app);
+			}
+			groupApp.setListAppBean(listApp);
 			listGroup.add(groupApp);
 		}
 		return listGroup;
@@ -60,25 +114,40 @@ public class App05LogicImpl implements App05LogicIF{
 			boolean hasIosApp = template.opsForHash().hasKey(key, "ios");
 			if (hasIosApp) {
 				String json = (String) template.opsForHash().get(key, "ios");
-				OSConfigBean iosConfig = objMapper.convertValue(json, OSConfigBean.class);
-				iosConfig.setOsId(APP01Action.OS_IOS_ID);
-				listOsConfig.add(iosConfig);
+				OSConfigBean iosConfig;
+				try {
+					iosConfig = objMapper.readValue(json, OSConfigBean.class);
+					iosConfig.setOsId(APP01Action.OS_IOS_ID);
+					listOsConfig.add(iosConfig);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			
 			boolean hasAndroid = template.opsForHash().hasKey(key, "android");
 			if (hasAndroid) {
 				String json = (String)template.opsForHash().get(key,"android");
-				OSConfigBean androidConfig = objMapper.convertValue(json, OSConfigBean.class);
-				androidConfig.setOsId(APP01Action.OS_ANDROID_ID);
-				listOsConfig.add(androidConfig);
+				try {
+					OSConfigBean androidConfig = objMapper.readValue(json, OSConfigBean.class);
+					androidConfig.setOsId(APP01Action.OS_ANDROID_ID);
+					listOsConfig.add(androidConfig);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			
 			boolean hasWindows = template.opsForHash().hasKey(key, "windows");
 			if (hasWindows) {
 				String json = (String)template.opsForHash().get(key, "windows");
-				OSConfigBean windowsConfig = objMapper.convertValue(json, OSConfigBean.class);
-				windowsConfig.setOsId(APP01Action.OS_WINDOWS_ID);
-				listOsConfig.add(windowsConfig);
+				try {
+					OSConfigBean windowsConfig = objMapper.readValue(json, OSConfigBean.class);
+					windowsConfig.setOsId(APP01Action.OS_WINDOWS_ID);
+					listOsConfig.add(windowsConfig);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			groupApp.setListOsConfig(listOsConfig);
@@ -87,4 +156,142 @@ public class App05LogicImpl implements App05LogicIF{
 			return null;
 		}
 	}
+	
+	@Override
+	public String validateGroupAppEdit(GroupAppBean groupAppEdit) {
+		List<OSConfigBean> listOsConfig = groupAppEdit.getListOsConfig();
+		if (listOsConfig != null && listOsConfig.size() > 0) {
+			if (listOsConfig.size() > NUMBER_OS) {
+				return "Chỉ được config cho nhiều nhất "+ NUMBER_OS +" hệ điều hành";
+			}
+			for (int idx = 0;idx < listOsConfig.size(); idx++) {
+				OSConfigBean osConfig = listOsConfig.get(idx);
+				if ("-1".equals(osConfig.getOsId())) {
+					return "Hãy chọn hệ điều hành cho Config thứ " + (idx+1);
+				}
+				if ("-1".equals(osConfig.getUid())) {
+					return "Hãy chọn dev cho Config thứ " + (idx+1);
+				}
+				for (int j = idx+1;j<listOsConfig.size();j++) {
+					OSConfigBean osConfigNext = listOsConfig.get(j);
+					if (osConfig.getOsId().equals(osConfigNext.getOsId())) {
+						return "Config thứ " +(idx+1) + " và " + (j+1) + " cùng hệ điều hành. Hãy chọn lại";
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public List<UserBean> listAllDev() {
+		return app01Dao.selectAllDev();
+	}
+	
+	@Override
+	public void updateGroupApp(GroupAppBean groupAppEdit, String adminId) throws IOException{
+		List<OSConfigBean> listOsConfigOld = getGroupAppById(groupAppEdit.getGroupId()).getListOsConfig();
+		//Update for group
+		String queryDetailGroup = RedisConstant.DB_ADS_GROUP + ":" + groupAppEdit.getGroupId();
+		template.opsForHash().put(queryDetailGroup, "groupId", groupAppEdit.getGroupId());
+		template.opsForHash().put(queryDetailGroup, "groupName", groupAppEdit.getGroupName());
+		template.opsForHash().put(queryDetailGroup, "groupIcon", groupAppEdit.getGroupIcon());
+		template.opsForHash().put(queryDetailGroup, "groupTitle", groupAppEdit.getGroupTitle());
+		template.opsForHash().put(queryDetailGroup, "groupDescription", groupAppEdit.getGroupDescription());
+		template.opsForHash().put(queryDetailGroup, "imgBanner", groupAppEdit.getImgBanner());
+		template.opsForHash().put(queryDetailGroup, "imgVertical", groupAppEdit.getImgVertical());
+		template.opsForHash().put(queryDetailGroup, "imgHorizontal", groupAppEdit.getImgHorizontal());
+		
+		List<OSConfigBean> listOsConfigNew = groupAppEdit.getListOsConfig();
+		updateInfoOfOsGroup(groupAppEdit.getGroupId(), listOsConfigOld, listOsConfigNew);
+		//Update info for banner sample
+		String queryBannerSample = RedisConstant.DB_ADS_CUSTOMER + ":uid:" + adminId + ":sample:banners" ;
+		Set<String> bannerSampleIds = template.opsForSet().members(queryBannerSample);
+		for (String bannerId : bannerSampleIds) {
+			BannerBean bannerSample = app05Dao.selectBannerSampleById(bannerId);
+			
+			String bannerGroupSample = "banner_group_" + groupAppEdit.getGroupId();
+			String popupGroupSample = "popup_group_" + groupAppEdit.getGroupId();
+			if (bannerGroupSample.equals(bannerSample.getBannerName())) {
+				bannerSample.setUserId(Integer.parseInt(adminId));
+				bannerSample.setBannerDescription(groupAppEdit.getGroupDescription());
+				bannerSample.setImage1(groupAppEdit.getImgBanner());
+				app05Dao.updateBannerSample(bannerSample);
+			} else if (popupGroupSample.equals(bannerSample.getBannerName())){
+				bannerSample.setUserId(Integer.parseInt(adminId));
+				bannerSample.setBannerDescription(groupAppEdit.getGroupDescription());
+				bannerSample.setImage1(groupAppEdit.getImgHorizontal());
+				bannerSample.setImage2(groupAppEdit.getImgVertical());
+				app05Dao.updateBannerSample(bannerSample);
+			}
+		}
+	}
+	
+	
+	
+	public void updateInfoOfOsGroup(String groupId, List<OSConfigBean> listOsConfigOld, List<OSConfigBean> listOsConfigNew)throws IOException {
+//		String queryDetailGroup = RedisConstant.DB_ADS_GROUP + ":" + groupId;
+		int sizeOld = listOsConfigOld.size();
+		int sizeNew = listOsConfigNew.size();
+		
+		if (sizeOld == 0 && sizeNew ==0) {
+			return;
+		} else if (sizeOld == 0 && sizeNew >0) {
+			//Insert os Group
+			for (OSConfigBean osNew : listOsConfigNew) {
+				insertOsGroup(groupId,osNew);
+			}
+		} else if (sizeOld >0 && sizeNew ==0) {
+			//Delete os Group
+			for (OSConfigBean osOld : listOsConfigOld) {
+				deleteOsGroup(groupId, osOld);
+			}
+		} else {
+			//Update os Group
+			for (OSConfigBean osOld : listOsConfigOld) {
+				deleteOsGroup(groupId, osOld);
+			}
+			for (OSConfigBean osNew : listOsConfigNew) {
+				insertOsGroup(groupId, osNew);
+			}
+		}
+	}
+	
+	//Delete OsConfig in groupId
+	public void deleteOsGroup(String groupId, OSConfigBean osConfig) {
+		String queryDetailGroup = RedisConstant.DB_ADS_GROUP + ":" + groupId;
+		String queryDev = null;
+		if (APP01Action.OS_IOS_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:ios:groups";
+			template.opsForHash().delete(queryDetailGroup, "ios");
+		} else if (APP01Action.OS_ANDROID_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:android:groups";
+			template.opsForHash().delete(queryDetailGroup, "android");
+		} else if (APP01Action.OS_WINDOWS_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:windows:groups";
+			template.opsForHash().delete(queryDetailGroup, "windows");
+		}
+		template.opsForSet().remove(queryDev, groupId);
+	}
+	
+	//Insert osConfig to groupId
+	public void insertOsGroup(String groupId, OSConfigBean osConfig) throws IOException {
+		String queryDetailGroup = RedisConstant.DB_ADS_GROUP + ":" + groupId;
+		ObjectMapper jackson = new ObjectMapper();
+		String osConfigJson = jackson.writeValueAsString(osConfig);
+		String queryDev = null;
+		if (APP01Action.OS_IOS_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:ios:groups";
+			template.opsForHash().put(queryDetailGroup, "ios", osConfigJson);
+		} else if (APP01Action.OS_ANDROID_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:android:groups";
+			template.opsForHash().put(queryDetailGroup, "android", osConfigJson);
+		} else if (APP01Action.OS_WINDOWS_ID.equals(osConfig.getOsId())) {
+			queryDev = RedisConstant.DB_ADS_DEV + ":uid:" + osConfig.getUid() + ":os:windows:groups";
+			template.opsForHash().put(queryDetailGroup, "windows", osConfigJson);
+		}
+		template.opsForSet().add(queryDev, groupId);
+	}
+	
+	
 }
