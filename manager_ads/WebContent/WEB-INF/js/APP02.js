@@ -122,6 +122,10 @@ $(document).on('click','.btnAddObject',function(){
 		alert ('Hãy nhập tên của Object');
 		return;
 	}
+	if(/^[a-zA-Z0-9- ]*$/.test(txtObjName) == false) {
+	    alert('Không được nhập kí tự đặc biệt vào Object Name');
+	    return false;
+	}
 	var nameBtnObject = $(this).attr('name');
 	//add to parentConfig
 	var parentConfig = getAppConfigByNameOfButton(objConfig, nameBtnObject.substring(nameBtnObject.indexOf('_') + 1));

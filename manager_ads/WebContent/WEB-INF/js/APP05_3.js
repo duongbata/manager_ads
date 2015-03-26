@@ -29,10 +29,10 @@ $(document).on('click','.btnDelProp',function(){
 			var nextRow = $('#'+nextPropId);
 			
 			var txtPropName = nextRow.find('.txtPropName');
-			txtPropName.attr('name','appInsert.listProperty['+(i-1)+'].propertyName');
+			txtPropName.attr('name','appUpdate.listProperty['+(i-1)+'].propertyName');
 			
 			var txtPropValue = nextRow.find('.txtPropValue');
-			txtPropValue.attr('name','appInsert.listProperty['+(i-1)+'].propertyValue');
+			txtPropValue.attr('name','appUpdate.listProperty['+(i-1)+'].propertyValue');
 			
 			nextRow.attr('id',(i-1)+'_prop');
 		}
@@ -48,14 +48,14 @@ function addRowProperty(){
 	
 	var cellName = $('<td width="200px"></td>');
 	var txtName = $('<input>').attr('type','text')
-							  .attr('name', 'appInsert.listProperty['+numRow+'].propertyName')
+							  .attr('name', 'appUpdate.listProperty['+numRow+'].propertyName')
 							  .attr('class','form-control txtPropName');
 	cellName.append(txtName);
 	row.append(cellName);
 	
 	var cellValue = $('<td></td>');
 	var txtValue = $('<input>').attr('type','text')
-	  						   .attr('name', 'appInsert.listProperty['+numRow+'].propertyValue')
+	  						   .attr('name', 'appUpdate.listProperty['+numRow+'].propertyValue')
 	  						   .attr('class','form-control txtPropValue');
 	cellValue.append(txtValue);
 	row.append(cellValue);
@@ -73,9 +73,10 @@ function validateUpdate() {
 	
 	//Send json
 	var dataConfig = $('<input>').attr('type','hidden').attr('name','dataConfig').val(JSON.stringify(objConfig));
-	$('#formInsertApp').append(dataConfig);
+	$('#formUpdateApp').append(dataConfig);
 	return true;
 }
+
 
 function updateDataConfigBeforeSubmit(data, strParent) {
 	if (data.listFieldBean != null && data.listFieldBean != 'undefined' && data.listFieldBean.length > 0) {
@@ -326,14 +327,14 @@ $(document).on('click','.btnDelField',function(){
 	
 });
 function loadConfigBean(){
-	var link = CONTEXT_PATH + '/APP03_getConfigBean';
+	var link = CONTEXT_PATH + '/APP05_getConfigBean';
 	$.ajax({
 		type : "POST",
 		url : link,
 		dataType : 'json',
 		success : function(result) {
-			objConfig = result.appConfig;
-			var table = createTableByAppConfigBean(result.appConfig, '');
+			objConfig = result;
+			var table = createTableByAppConfigBean(result, '');
 			$('#configTable').append(table);
 		},
 		error : function(e) {

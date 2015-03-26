@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import app.bean.App03DataTrans;
 import app.bean.AppBean;
 import app.bean.AppConfigBean;
+import app.logic.App02LogicIF;
 import app.logic.App03LogicIF;
 
 @Controller
@@ -37,6 +38,9 @@ public class App03Action {
 	
 	@Autowired
 	private App03LogicIF app03Logic;
+	
+	@Autowired
+	private App02LogicIF app02Logic;
 	
 	@Action(value="/APP03_init"
 			, interceptorRefs={
@@ -101,7 +105,9 @@ public class App03Action {
 		App03DataTrans dataTrans = (App03DataTrans) info.getDataTrans();
 		AppBean appDetail = dataTrans.getAppDetail();
 		if (appDetail != null) {
-			appConfig = new ObjectMapper().readValue(appDetail.getConfig(), AppConfigBean.class);
+			/*appConfig = new ObjectMapper().readValue(appDetail.getConfig(), AppConfigBean.class);*/
+			appConfig = app02Logic.createAppConfigFromStr(appDetail.getConfig());
+			appConfig.setNameConfig("Config");
 		}
 		return "success";
 	}
@@ -115,14 +121,17 @@ public class App03Action {
 				@Result(name="success",location="APP03_2",type="tiles")
 				, @Result(name="failure",location="APP03_2", type="tiles")
 			})
-	public String updateApp(){
+	public String updateApp() throws Exception{
 		String dataConfig = ServletActionContext.getRequest().getParameter("dataConfig");
+		
+		AppConfigBean appConfig = new ObjectMapper().readValue(dataConfig, AppConfigBean.class);
+		String config = app02Logic.createJSONObjectFromAppConfig(appConfig).toString();
 		
 		App03DataTrans dataTrans = (App03DataTrans) info.getDataTrans();
 		AppBean appDetail = dataTrans.getAppDetail();
 		appDetail.setVersion(appUpdate.getVersion());
 		appDetail.setUrl(appUpdate.getUrl());
-		appDetail.setConfig(dataConfig);
+		appDetail.setConfig(config);
 		boolean isUpdated = app03Logic.updateApp(appDetail, String.valueOf(info.getUser().getId()));
 		
 		appUpdate = appDetail;

@@ -12,12 +12,15 @@ import manager.common.bean.ConstantBean;
 import manager.common.bean.RedisConstant;
 import manager.common.bean.UserBean;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import app.action.APP01Action;
 import app.bean.AppBean;
+import app.bean.AppConfigBean;
+import app.bean.FieldBean;
 import app.bean.PropertyAppBean;
 import app.dao.APP02Dao;
 import app.logic.App02LogicIF;
@@ -248,5 +251,52 @@ public class App02LogicImpl implements App02LogicIF{
 			return null;
 		}
 		
+	}
+	
+	@Override
+	public AppConfigBean createAppConfigFromStr(String str) {
+		AppConfigBean appConfig = new AppConfigBean();
+		JSONObject jsonObj = new JSONObject(str);
+		Set<String> keys = jsonObj.keySet();
+		if (keys != null && keys.size() >0) {
+			List<AppConfigBean> listAppConfig = new ArrayList<AppConfigBean>();
+			List<FieldBean> listField = new ArrayList<FieldBean>();
+			for (String key : keys) {
+				Object obj = jsonObj.get(key);
+				if (obj instanceof JSONObject) {
+					AppConfigBean app = createAppConfigFromStr(obj.toString());
+					app.setNameConfig(key);
+					listAppConfig.add(app);
+				} else {
+					FieldBean field = new FieldBean();
+					field.setName(key);
+					field.setValue(obj.toString());
+					listField.add(field);
+				}
+			}
+			appConfig.setListConfigBean((listAppConfig.size() == 0) ? null : listAppConfig);
+			appConfig.setListFieldBean((listField.size() == 0)? null : listField);
+		}
+		
+		return appConfig;
+	}
+	
+	@Override
+	public JSONObject createJSONObjectFromAppConfig(AppConfigBean appConfig) {
+		JSONObject jsonObj = new JSONObject();
+		List<AppConfigBean> listAppConfig = appConfig.getListConfigBean();
+		if (listAppConfig != null && listAppConfig.size() > 0) {
+			for (AppConfigBean app : listAppConfig) {
+				JSONObject toJson = createJSONObjectFromAppConfig(app);
+				jsonObj.put(app.getNameConfig(), toJson);
+			}
+		}
+		List<FieldBean> listField = appConfig.getListFieldBean();
+		if (listField != null && listField.size() > 0) {
+			for (FieldBean field : listField) {
+				jsonObj.put(field.getName(), field.getValue());
+			}
+		}
+		return jsonObj;
 	}
 }

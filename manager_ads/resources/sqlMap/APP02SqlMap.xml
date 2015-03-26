@@ -40,13 +40,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="updateUrlOfBanner" parameterType="bannerBean">
 		UPDATE ads_banner
 		<trim prefix="SET" prefixOverrides=",">
-			<if test="androidUrl != null and androidUrl != ''">
+			<if test="androidUrl != null">
 				, android_url = #{androidUrl}
 			</if>
-			<if test="iosUrl != null and iosUrl != ''">
+			<if test="iosUrl != null">
 				, ios_url = #{iosUrl}
 			</if>
-			<if test="windowsUrl != null and windowsUrl != ''">
+			<if test="windowsUrl != null">
 				, windows_url = #{windowsUrl}
 			</if>
 		</trim>

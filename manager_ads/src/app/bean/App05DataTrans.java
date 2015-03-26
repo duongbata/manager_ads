@@ -19,6 +19,8 @@ public class App05DataTrans implements DataTransIF{
 	private List<UserBean> listDev;
 	
 	private Map<String, String> mapOs;
+	
+	private AppBean appDetail;
 
 	public List<GroupAppBean> getListGroupApp() {
 		return listGroupApp;
@@ -74,5 +76,13 @@ public class App05DataTrans implements DataTransIF{
 
 	public void setMapOs(Map<String, String> mapOs) {
 		this.mapOs = mapOs;
+	}
+
+	public AppBean getAppDetail() {
+		return appDetail;
+	}
+
+	public void setAppDetail(AppBean appDetail) {
+		this.appDetail = appDetail;
 	}
 }

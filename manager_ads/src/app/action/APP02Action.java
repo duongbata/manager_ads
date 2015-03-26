@@ -17,6 +17,7 @@ import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -99,9 +100,12 @@ public class APP02Action {
 				, @Result(name="failure",location="APP02", type="tiles")
 			})
 	public String insertApp() throws JsonParseException, JsonMappingException, IOException {
-		
 		String dataConfig = ServletActionContext.getRequest().getParameter("dataConfig");
-		appInsert.setConfig(dataConfig);
+		//To String
+		AppConfigBean appConfig = new ObjectMapper().readValue(dataConfig, AppConfigBean.class);
+		String config = app02Logic.createJSONObjectFromAppConfig(appConfig).toString();
+		appInsert.setConfig(config);
+		
 		appInsert.setUid(String.valueOf(dev.getId()));
 		try {
 			app02Logic.insertAppBean(appInsert, appInsert.getUid(), String.valueOf(info.getUser().getId()));

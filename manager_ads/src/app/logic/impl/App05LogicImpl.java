@@ -293,5 +293,77 @@ public class App05LogicImpl implements App05LogicIF{
 		template.opsForSet().add(queryDev, groupId);
 	}
 	
+	@Override
+	public AppBean getAppBeanByUserAndId(String appId, String uid) {
+		AppBean appBean = new AppBean();
+		List<PropertyAppBean> listProp = new ArrayList<PropertyAppBean>();
+		appBean.setUid(uid);
+		String os = appId.split("_")[0];
+		String groupId = appId.substring(os.length()+1);
+		appBean.setGroupId(groupId);
+		
+		String queryAppOfGroup = RedisConstant.DB_ADS_DEV + ":uid:" + uid + ":group:" + groupId + ":app:" + appId;
+		Set<Object> setKeyOfApp = template.opsForHash().keys(queryAppOfGroup);
+		for (Object key : setKeyOfApp) {
+			String strKey = (String)key;
+			String strValue = (String)template.opsForHash().get(queryAppOfGroup, strKey);
+			if ("appId".equals(strKey)) {
+				appBean.setAppId(strValue);
+			} else if ("osId".equals(strKey)) {
+				appBean.setOsId(strValue);
+			} else if ("version".equals(strKey)) {
+				appBean.setVersion(strValue);
+			} else if ("url".equals(strKey)) {
+				appBean.setUrl(strValue);
+			} else if ("config".equals(strKey)) {
+				appBean.setConfig(strValue);
+			} else {
+				PropertyAppBean prop = new PropertyAppBean();
+				prop.setPropertyName(strKey);
+				prop.setPropertyValue(strValue);
+				listProp.add(prop);
+			}
+		}
+		appBean.setListProperty(listProp);
+		return appBean;
+	}
 	
+	@Override
+	public boolean updateApp(AppBean appBean, String devIdOld) {
+		try {
+			String queryAppDetail = RedisConstant.DB_ADS_DEV + ":uid:" + appBean.getUid() + ":group:" + appBean.getGroupId() + ":app:" + appBean.getAppId();
+			
+			if (!devIdOld.equals(appBean.getUid())) {
+				//Delete info of devOld
+				String queryListAppOfDevOld = RedisConstant.DB_ADS_DEV + ":uid:" + devIdOld + ":group:" + appBean.getGroupId() + ":apps";
+				String queryAppDetailOld = RedisConstant.DB_ADS_DEV + ":uid:" + devIdOld + ":group:" + appBean.getGroupId() + ":app:" + appBean.getAppId();
+				template.delete(queryAppDetailOld);
+				template.opsForSet().remove(queryListAppOfDevOld, appBean.getAppId());
+				
+				//Add appId for list app of devNew
+				String queryListAppOfDevNew = RedisConstant.DB_ADS_DEV + ":uid:" + appBean.getUid() + ":group:" + appBean.getGroupId() + ":apps";
+				template.opsForSet().add(queryListAppOfDevNew, appBean.getAppId());
+				
+			} 
+			
+			if (template.hasKey(queryAppDetail)) {
+				template.delete(queryAppDetail);
+			}
+			
+			//Insert new
+			template.opsForHash().put(queryAppDetail, "appId", appBean.getAppId());
+			template.opsForHash().put(queryAppDetail, "url", appBean.getUrl());
+			template.opsForHash().put(queryAppDetail, "version", appBean.getVersion());
+			template.opsForHash().put(queryAppDetail, "config", appBean.getConfig());
+			template.opsForHash().put(queryAppDetail, "osId", appBean.getOsId());
+			if (appBean.getListProperty() != null && appBean.getListProperty().size() > 0) {
+				for (PropertyAppBean prop : appBean.getListProperty()) {
+					template.opsForHash().put(queryAppDetail, prop.getPropertyName(), prop.getPropertyValue());
+				}
+			}
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
 }
