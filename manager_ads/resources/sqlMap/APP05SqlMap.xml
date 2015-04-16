@@ -29,7 +29,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="maxViewPerDay" column="max_view_per_day"/>
 	</resultMap>
 	<select id="selectBannerSampleById" parameterType="string" resultMap="bannerObject">
-		SELECT bannerId as banner_id,name as banner_name from ads_banner
+		SELECT bannerId as banner_id
+			, name as banner_name
+			, des as banner_des
+			, bannerType as banner_type
+			, image1 as image1
+			, image2 as image2
+			, android_url as android_url
+			, ios_url as ios_url
+			, windows_url as windows_url
+			, startTime as start_time
+			, stopTime as stop_time
+			, campaignId as campaign_id
+		from ads_banner
 		where campaignId = -1
 		and bannerId = #{bannerId}
 	</select>
@@ -40,5 +52,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			, image2 = #{image2}
 		where bannerId = #{bannerId} 
 	</update>
-	
+	<delete id="deleteBannerById" parameterType="string">
+		delete from ads_banner
+		WHERE bannerId = #{bannerId}
+	</delete>
 </mapper>

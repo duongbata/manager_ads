@@ -214,6 +214,16 @@ public class App02LogicImpl implements App02LogicIF{
 				}
 			}
 		}
+		/*String key = RedisConstant.DB_ADS_GROUP + ":" + groupId;
+		if (template.opsForHash().hasKey(key, "ios")) {
+			allOs.put(APP01Action.OS_IOS_ID, "ios");
+		}
+		if (template.opsForHash().hasKey(key, "android")) {
+			allOs.put(APP01Action.OS_ANDROID_ID, "android");
+		} 
+		if (template.opsForHash().hasKey(key, "windows")) {
+			allOs.put(APP01Action.OS_WINDOWS_ID, "windows");
+		}*/
 		return allOs;
 	}
 	

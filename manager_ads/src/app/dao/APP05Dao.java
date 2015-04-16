@@ -12,6 +12,8 @@ public class APP05Dao {
 	
 	private final static String UPDATE_BANNER_SAMPLE = "updateBannerSample";
 	
+	private final static String DELETE_BANNER_BY_ID = "deleteBannerById";
+	
 	private String namespace;
 	
 	@Autowired
@@ -29,6 +31,11 @@ public class APP05Dao {
 	public void updateBannerSample(BannerBean bannerSample){
 		String query = namespace +"." + UPDATE_BANNER_SAMPLE;
 		managerAppsSqlSession.update(query, bannerSample);
+	}
+	
+	public void deleteBannerById(String bannerId) {
+		String query = namespace + "." + DELETE_BANNER_BY_ID;
+		managerAppsSqlSession.delete(query, bannerId);
 	}
 	
 	private void setNamespace(String namespace) {

@@ -21,4 +21,8 @@ public interface App05LogicIF {
 	AppBean getAppBeanByUserAndId(String appId, String uid);
 	
 	boolean updateApp(AppBean appBean, String devIdOld);
+	
+	void deleteAppById(String appId);
+	
+	void deleteAppByGroupId(String groupId,String uid);
 }

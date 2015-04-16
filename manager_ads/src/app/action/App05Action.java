@@ -209,6 +209,44 @@ public class App05Action {
 		}
 	}
 	
+	@Action(value="/APP05_deleteAppByAppId"
+			, interceptorRefs={
+				@InterceptorRef(value="scope",params={"key","infoValue","session","info","autoCreateSession","true"})
+				, @InterceptorRef("basicStack")
+			}
+			, results={
+				@Result(name="success",type="json",params={"root","Delete"})
+			})
+	public String deleteAppByAppId() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String appId = request.getParameter("appId");
+		try {
+			app05Logic.deleteAppById(appId);
+		} catch (Exception ex){
+			ex.printStackTrace();
+		}
+		return "success";
+	}
+	
+	@Action(value="/APP05_deleteGroupByGroupId"
+			, interceptorRefs={
+				@InterceptorRef(value="scope",params={"key","infoValue","session","info","autoCreateSession","true"})
+				, @InterceptorRef("basicStack")
+			}
+			, results={
+				@Result(name="success",type="json",params={"root","Delete"})
+			})
+	public String deleteGroupByGroupId() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String groupId = request.getParameter("groupId");
+		try {
+			app05Logic.deleteAppByGroupId(groupId,String.valueOf(info.getUser().getId()));
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return "success";
+	}
+	
 	public InfoValue getInfo() {
 		return info;
 	}

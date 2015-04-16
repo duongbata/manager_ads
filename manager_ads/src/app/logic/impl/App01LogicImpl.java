@@ -1,6 +1,8 @@
 package app.logic.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +68,10 @@ public class App01LogicImpl implements App01LogicIF{
 			}
 		}
 		
+		//Save to Set groupID
+		String queryOfGroups = "db:ads:groups";
+		template.opsForSet().add(queryOfGroups, groupAppInsert.getGroupId());
+		
 		//Create 2 Banner Sample for group (name : 'banner_group_'XXX & 'popup_group_'XXX)
 		BannerBean banner = new BannerBean();
 		banner.setBannerName("banner_group_"+groupAppInsert.getGroupId());
@@ -86,5 +92,23 @@ public class App01LogicImpl implements App01LogicIF{
 		
 		adv03Logic.insertSampleBanner(banner);
 		adv03Logic.insertSampleBanner(popup);
+		
+		template.opsForHash().put(queryDetailGroup, "banner_sample", String.valueOf(banner.getBannerId()));
+		template.opsForHash().put(queryDetailGroup, "popup_sample", String.valueOf(popup.getBannerId()));
+	}
+	
+	@Override
+	public boolean existGroupId(String groupId) {
+		String key = "db:ads:groups";
+		if (template.opsForSet().isMember(key, groupId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public Set<String> getSetGroupId() {
+		return template.opsForSet().members("db:ads:groups");
 	}
 }

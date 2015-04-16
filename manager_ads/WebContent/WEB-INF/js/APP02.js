@@ -469,6 +469,7 @@ function getAllOsOfGroup() {
 	$('#devId').empty();
 	var groupId = $('#groupId').val();
 	if (groupId == -1 || groupId == null) {
+		$('#devName').val('');
 		return;
 	}
 	var link = CONTEXT_PATH + '/APP02_getAllOsOfGroup';
@@ -493,9 +494,11 @@ function getUserByOsAndGroup(){
 	var groupId = $('#groupId').val();
 	var osId = $('#osId').val();
 	if (groupId == '-1' || groupId == null) {
+		$('#devName').val('');
 		return;
 	}
 	if (osId == '-1' || osId == null) {
+		$('#devName').val('');
 		return;
 	}
 	

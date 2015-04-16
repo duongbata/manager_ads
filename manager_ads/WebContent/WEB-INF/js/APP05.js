@@ -41,3 +41,48 @@ $(document).ready(function(){
 	        }
 	    });
 });
+
+$(document).on('click','.btnDelGroup',function(){
+	var isDeleted = confirm('Xóa group ?');
+	if (!isDeleted) {
+		return;
+	}
+	var groupId = $(this).closest('tr').find('.groupId').val();
+	var link = CONTEXT_PATH + '/APP05_deleteGroupByGroupId';
+	$.ajax({
+		type : "POST",
+		url : link,
+		data : "groupId="+groupId,
+		dataType : 'json',
+		success : function(result) {
+			 
+		},
+		error : function(e) {
+			alert ('Lỗi trong quá trình xóa');
+		}
+	});
+	$(this).closest('tr').remove();
+});
+
+$(document).on('click','.btnDelApp',function(){
+	var isDeleted = confirm('Xóa app ?');
+	if (!isDeleted) {
+		return;
+	}
+	var appId = $(this).prop('id');
+	var link = CONTEXT_PATH + '/APP05_deleteAppByAppId';
+	$.ajax({
+		type : "POST",
+		url : link,
+		data : "appId="+appId,
+		dataType : 'json',
+		success : function(result) {
+			 
+		},
+		error : function(e) {
+			alert ('Lỗi trong quá trình xóa');
+		}
+	});
+	$(this).closest('td').find('.link_'+appId).remove();
+	$(this).remove();
+});

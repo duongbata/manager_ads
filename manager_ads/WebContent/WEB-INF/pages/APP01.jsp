@@ -1,23 +1,39 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="s" uri="/struts-tags"%>
+<link type="text/css" rel="stylesheet" href="resources/css/awesomplete.css" />
+<script type="text/javascript" src="resources/js/awesomplete.js"></script>
+<script type="text/javascript" src="resources/js/APP01.js"></script>
 <div class="container">
-	<s:form action="APP01_insertGroup">
+	<s:form action="APP01_insertGroup" onsubmit="return validateInsert();">
+		<s:if test="%{info.dataTrans.existGroup}">
+			<s:property value="%{info.dataTrans.message}"/>
+			<s:set var="link">/APP01_redirectToEditGroup.action?groupId=<s:property value="%{groupAppInsert.groupId}"/></s:set>
+			<s:a value="%{#link}">
+				Chi tiết
+			</s:a>
+		</s:if>
+		<s:else>
+			<s:if test="%{info.dataTrans.message != null}">
+				<s:property value="%{info.dataTrans.message}"/>
+			</s:if>
+		</s:else>
 		<div class="row">
 			<br/><s:submit value="Save" cssStyle="width:100px" cssClass="btn btn-default btn-xs btn-primary"/> <br/><br/>
+<!-- 			<input type="button" id="btnCall" value="Call" class="btn btn-default btn-xs btn-primary"> -->
 		</div>
 		<div class="row">
 			<table class="table table-condensed table-hover table-bordered">
 				<tr>
 					<td class="info" style="vertical-align: middle;">ID</td>
 					<td style="vertical-align: middle;">
-						<s:textfield name="groupAppInsert.groupId" cssClass="form-control" value=""/>
+						<s:textfield name="groupAppInsert.groupId" cssClass="form-control" id="txtGroupId" value="%{groupAppInsert.groupId}"/>
 					</td>
 				</tr>
 				<tr>
 					<td class="info" style="vertical-align: middle;">Name</td>
 					<td style="vertical-align: middle;">
-						<s:textfield name="groupAppInsert.groupName" cssClass="form-control"/>
+						<s:textfield name="groupAppInsert.groupName" cssClass="form-control" id="txtGroupName"/>
 					</td>
 				</tr>
 				<tr>
@@ -109,7 +125,7 @@
 										User 
 									</td>
 									<td>
-										<s:select name="groupAppInsert.listOsConfig[%{#listOsConfigStatus.index}].uid" list="listDev" listKey="id" listValue="name" value="-1" cssClass="form-control" cssStyle="width:200px"/>
+										<s:select name="groupAppInsert.listOsConfig[%{#listOsConfigStatus.index}].uid" list="info.dataTrans.listDev" listKey="id" listValue="name" value="-1" cssClass="form-control" cssStyle="width:200px"/>
 									</td>
 								</tr>
 							</table>

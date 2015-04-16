@@ -11,4 +11,6 @@ public class RedisConstant {
 	
 	/*Admob*/
 	public static final String DB_ADS_ADMOB = "db:ads:admob";
+	
+	public static final String DB_ADS_BANNER_SAMPLE = "db:ads:banner_sample";
 }

@@ -217,17 +217,39 @@ public class App05LogicImpl implements App05LogicIF{
 				bannerSample.setBannerDescription(groupAppEdit.getGroupDescription());
 				bannerSample.setImage1(groupAppEdit.getImgBanner());
 				app05Dao.updateBannerSample(bannerSample);
+				updateDetailBanner(bannerSample);
+				
 			} else if (popupGroupSample.equals(bannerSample.getBannerName())){
 				bannerSample.setUserId(Integer.parseInt(adminId));
 				bannerSample.setBannerDescription(groupAppEdit.getGroupDescription());
 				bannerSample.setImage1(groupAppEdit.getImgHorizontal());
 				bannerSample.setImage2(groupAppEdit.getImgVertical());
 				app05Dao.updateBannerSample(bannerSample);
+				updateDetailBanner(bannerSample);
 			}
 		}
 	}
 	
-	
+	public void updateDetailBanner(BannerBean bannerSample) {
+		String queryDetailBannerSample = RedisConstant.DB_ADS_BANNER_SAMPLE + ":" + bannerSample.getBannerId();
+		if (template.hasKey(queryDetailBannerSample)) {
+			template.delete(queryDetailBannerSample);
+		}
+		
+		template.opsForHash().put(queryDetailBannerSample, "bannerId", String.valueOf(bannerSample.getBannerId()));
+		template.opsForHash().put(queryDetailBannerSample, "bannerName", bannerSample.getBannerName());
+		template.opsForHash().put(queryDetailBannerSample, "campaignId", String.valueOf(bannerSample.getCampaignId()));
+		template.opsForHash().put(queryDetailBannerSample, "description", bannerSample.getBannerDescription() == null ? "" : bannerSample.getBannerDescription());
+		template.opsForHash().put(queryDetailBannerSample, "bannerType", String.valueOf(bannerSample.getBannerType()));
+//		template.opsForHash().put(queryDetailBannerSample, "bannerTypeName", bannerInsert.getBannerTypeName());
+		template.opsForHash().put(queryDetailBannerSample, "startTime", String.valueOf(bannerSample.getStartTime().getTime()));
+		template.opsForHash().put(queryDetailBannerSample, "stopTime", String.valueOf(bannerSample.getStopTime().getTime()));
+		template.opsForHash().put(queryDetailBannerSample, "image1", bannerSample.getImage1() == null ? "" : bannerSample.getImage1());
+		template.opsForHash().put(queryDetailBannerSample, "image2", bannerSample.getImage2() == null ? "" : bannerSample.getImage1());
+		template.opsForHash().put(queryDetailBannerSample, "androidUrl", bannerSample.getAndroidUrl() == null ? "" : bannerSample.getAndroidUrl());
+		template.opsForHash().put(queryDetailBannerSample, "iosUrl", bannerSample.getIosUrl() == null ? "" : bannerSample.getIosUrl());
+		template.opsForHash().put(queryDetailBannerSample, "windowsUrl", bannerSample.getWindowsUrl() == null ? "" : bannerSample.getWindowsUrl());
+	}
 	
 	public void updateInfoOfOsGroup(String groupId, List<OSConfigBean> listOsConfigOld, List<OSConfigBean> listOsConfigNew)throws IOException {
 //		String queryDetailGroup = RedisConstant.DB_ADS_GROUP + ":" + groupId;
@@ -366,4 +388,71 @@ public class App05LogicImpl implements App05LogicIF{
 			return false;
 		}
 	}
+	
+	@Override
+	/*
+	 * (non-Javadoc) Chỉ xóa ở detail app
+	 * @see app.logic.App05LogicIF#deleteAppById(java.lang.String)
+	 */
+	public void deleteAppById(String appId) {
+		String os = appId.split("_")[0];
+		String groupId = appId.substring(os.length() + 1);
+		//Delete info app : db:ads:dev:uid:{uid}:group:{groupId}:app:{appId}
+		String patternAppDetail = "db:ads:dev:uid:*:group:"+groupId+":app:"+appId;
+		Set<String> sKeyApp = template.keys(patternAppDetail); 
+		for (String keyApp : sKeyApp) {
+			template.delete(keyApp);
+		}
+		//Delete app in list app of group : db:ads:dev:uid:{uid}:group:{groupId}:apps
+		/*String patternGroupOfApp = "db:ads:dev:uid:*:group:"+groupId+":apps";
+		Set<String> sKeyAppOfGroup = template.keys(patternGroupOfApp);
+		for (String keyAppOfGroup : sKeyAppOfGroup) {
+			if (template.opsForSet().isMember(keyAppOfGroup, appId)) {
+				template.opsForSet().remove(keyAppOfGroup, appId);
+			}
+			//If list app of group == 0 -> delete key
+			if (template.opsForSet().members(keyAppOfGroup).size() == 0) {
+				template.delete(keyAppOfGroup);
+			}
+			
+		}*/
+		
+		//Delete in group : db:ads:group:{groupId}
+		/*String keyGroup = "db:ads:group:"+groupId;
+		template.opsForHash().delete(keyGroup, os);*/
+	}
+	
+	@Override
+	public void deleteAppByGroupId(String groupId, String uid) {
+		String keyOfGroup = "db:ads:group:"+groupId;
+		String bannerSampleId = (String) template.opsForHash().get(keyOfGroup, "banner_sample");
+		String popupSampleId = (String) template.opsForHash().get(keyOfGroup, "popup_sample");
+		//Delete all key has groupId
+		String patternGroup = "db:ads:*"+groupId+"*";
+		Set<String> sKey = template.keys(patternGroup);
+		for (String key : sKey) {
+			template.delete(key);
+		}
+		//Delete groupId in db:ads:dev:uid:{uid}:os:{osId}:groups
+		String patternGroupOfDev = "db:ads:dev:uid:*:os:*:groups";
+		Set<String> sKeyGroupOfDev = template.keys(patternGroupOfDev);
+		for (String keyGroupOfDev : sKeyGroupOfDev) {
+			if (template.opsForSet().isMember(keyGroupOfDev, groupId)) {
+				template.opsForSet().remove(keyGroupOfDev, groupId);
+			}
+		}
+		
+		//Delete groupId in db:ads:groups
+		String patterListGroupId = "db:ads:groups";
+		template.opsForSet().remove(patterListGroupId, groupId);
+		
+		//Delete banner sample
+		app05Dao.deleteBannerById(bannerSampleId);
+		app05Dao.deleteBannerById(popupSampleId);
+		String keyListBannerSample = "db:ads:customer:uid:" + uid + ":sample:banners";
+		template.opsForSet().remove(keyListBannerSample, bannerSampleId);
+		template.opsForSet().remove(keyListBannerSample, popupSampleId);
+	}
+	
+	
 }

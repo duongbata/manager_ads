@@ -139,7 +139,7 @@ public class ADV03LogicImpl implements ADV03LogicIF{
 			template.opsForHash().put(query, "maxView", bannerEdit.getMaxView());
 			template.opsForHash().put(query, "bannerType", String.valueOf(bannerEdit.getBannerType()));
 			template.opsForHash().put(query, "description", bannerEdit.getBannerDescription());
-			template.opsForHash().put(query, "bannerTypeName", bannerEdit.getBannerTypeName());
+//			template.opsForHash().put(query, "bannerTypeName", bannerEdit.getBannerTypeName());
 			template.opsForHash().put(query, "image1", bannerEdit.getImage1());
 			template.opsForHash().put(query, "image2", bannerEdit.getImage2());
 			template.opsForHash().put(query, "androidUrl", bannerEdit.getAndroidUrl());
@@ -182,6 +182,22 @@ public class ADV03LogicImpl implements ADV03LogicIF{
 		//To redis
 		String query = RedisConstant.DB_ADS_CUSTOMER + ":uid:" + bannerInsert.getUserId() + ":sample:banners" ;
 		template.opsForSet().add(query, String.valueOf(maxId));
+		
+		bannerInsert.setCampaignId(-1);
+		String queryDetailBannerSample = RedisConstant.DB_ADS_BANNER_SAMPLE + ":" + bannerInsert.getBannerId();
+		template.opsForHash().put(queryDetailBannerSample, "bannerId", String.valueOf(bannerInsert.getBannerId()));
+		template.opsForHash().put(queryDetailBannerSample, "bannerName", bannerInsert.getBannerName());
+		template.opsForHash().put(queryDetailBannerSample, "campaignId", String.valueOf(bannerInsert.getCampaignId()));
+		template.opsForHash().put(queryDetailBannerSample, "description", bannerInsert.getBannerDescription() == null ? "" : bannerInsert.getBannerDescription());
+		template.opsForHash().put(queryDetailBannerSample, "bannerType", String.valueOf(bannerInsert.getBannerType()));
+//		template.opsForHash().put(queryDetailBannerSample, "bannerTypeName", bannerInsert.getBannerTypeName());
+		template.opsForHash().put(queryDetailBannerSample, "startTime", String.valueOf(bannerInsert.getStartTime().getTime()));
+		template.opsForHash().put(queryDetailBannerSample, "stopTime", String.valueOf(bannerInsert.getStopTime().getTime()));
+		template.opsForHash().put(queryDetailBannerSample, "image1", bannerInsert.getImage1() == null ? "" : bannerInsert.getImage1());
+		template.opsForHash().put(queryDetailBannerSample, "image2", bannerInsert.getImage2() == null ? "" : bannerInsert.getImage1());
+		template.opsForHash().put(queryDetailBannerSample, "androidUrl", bannerInsert.getAndroidUrl() == null ? "" : bannerInsert.getAndroidUrl());
+		template.opsForHash().put(queryDetailBannerSample, "iosUrl", bannerInsert.getIosUrl() == null ? "" : bannerInsert.getIosUrl());
+		template.opsForHash().put(queryDetailBannerSample, "windowsUrl", bannerInsert.getWindowsUrl() == null ? "" : bannerInsert.getWindowsUrl());
 	}
 	
 	@Override
@@ -242,7 +258,7 @@ public class ADV03LogicImpl implements ADV03LogicIF{
 			template.opsForHash().put(query, "bannerName", bannerInsert.getBannerName() == null ? "" : bannerInsert.getBannerName());
 			template.opsForHash().put(query, "description", bannerInsert.getBannerDescription() == null ? "" : bannerInsert.getBannerDescription());
 			template.opsForHash().put(query, "bannerType", String.valueOf(bannerInsert.getBannerType()));
-			template.opsForHash().put(query, "bannerTypeName", bannerInsert.getBannerTypeName() == null ? "" : bannerInsert.getBannerTypeName());
+//			template.opsForHash().put(query, "bannerTypeName", bannerInsert.getBannerTypeName() == null ? "" : bannerInsert.getBannerTypeName());
 			template.opsForHash().put(query, "image1", bannerInsert.getImage1() == null ? "" : bannerInsert.getImage1());
 			template.opsForHash().put(query, "image2", bannerInsert.getImage2() == null ? "" : bannerInsert.getImage2());
 			template.opsForHash().put(query, "androidUrl", bannerInsert.getAndroidUrl() == null ? "" : bannerInsert.getAndroidUrl());

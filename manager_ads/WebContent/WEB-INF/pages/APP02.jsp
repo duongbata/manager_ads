@@ -28,7 +28,7 @@
 				<tr>
 					<td class="info" style="vertical-align: middle;">Group</td>
 					<td style="vertical-align: middle;">
-						<s:select name="appInsert.groupId" id="groupId" list="mapGroup" cssClass="form-control" cssStyle="width:150px;"/>
+						<s:select name="appInsert.groupId" id="groupId" list="mapGroup" cssClass="form-control" cssStyle="width:150px;" value="-1"/>
 					</td>
 				</tr>
 				<tr>

@@ -40,10 +40,10 @@
 					<span class="glyphicon glyphicon-cog"></span> Admob
 				</s:a>
 				<s:a href="APP01_init" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
-					<span class="glyphicon glyphicon-cog"></span> Group App
+					<span class="glyphicon glyphicon-cog"></span> Tạo Group
 				</s:a>
 				<s:a href="APP02_init" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
-					<span class="glyphicon glyphicon-th-list"></span> App
+					<span class="glyphicon glyphicon-th-list"></span> Tạo App
 				</s:a>
 				<s:a href="APP05_init" cssClass="btn btn-default btn-xs btn-success" style="width:100px">
 					<span class="glyphicon glyphicon-th-list"></span> List Group

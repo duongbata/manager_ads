@@ -41,21 +41,33 @@
 					<s:iterator value="info.dataTrans.listGroupApp" status="listGroupAppStatus" var="group">
 						<tr>
 							<td style="vertical-align: middle;">
-								<s:property value="%{#listGroupAppStatus.index +1}"/>
+<%-- 								<s:property value="%{#listGroupAppStatus.index +1}"/> --%>
+								<button type="button" class="btn btn-default btn-xs btn-danger btnDelGroup">
+									<span class="glyphicon glyphicon-remove"></span>
+								</button>
 							</td>
 							<td style="vertical-align: middle;">
 								<s:set var="link">/APP05_initEditGroupApp.action?groupId=${groupId}</s:set>
 								<s:a value="%{#link}">
 									<s:property value="%{#group.groupName}"/>
 								</s:a>
+								<s:hidden name="#group.groupId" cssClass="groupId"></s:hidden>
 							</td>
 							<td style="vertical-align: middle;">
-								<s:iterator value="#group.listAppBean" status="listAppBeanStatus" var="appBean">
-									<s:set var="linkApp">/APP05_initDetailApp.action?uid=${uid}&&appId=${appId}</s:set>
-									<s:a value="%{#linkApp}">
-										<s:property value="%{#appBean.osId}"/><br/>	
-									</s:a>
-								</s:iterator>
+									<s:iterator value="#group.listAppBean" status="listAppBeanStatus" var="appBean">
+										<s:set var="linkApp">${pageContext.request.contextPath}/APP05_initDetailApp.action?uid=${uid}&&appId=${appId}</s:set>
+										<a href="${linkApp}" class="link_${appId}">
+											<s:property value="%{#appBean.osId}"/>
+										</a>
+										<%-- <s:a value="%{#linkApp}" cssClass="">
+											<s:property value="%{#appBean.osId}"/>
+										</s:a> --%>
+										<s:hidden name="#appBean.appId" cssClass="appId"></s:hidden>
+										<button type="button" class="btn btn-default btn-xs btn-danger btnDelApp" id="${appId}">
+											<span class="glyphicon glyphicon-remove"></span>
+										</button>
+										<br/>
+									</s:iterator>
 							</td>
 							<td style="vertical-align: middle;">
 								<s:property value="%{#group.groupDescription}"/>
